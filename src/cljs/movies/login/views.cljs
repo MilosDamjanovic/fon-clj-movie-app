@@ -10,7 +10,6 @@
         credentials (reagent/atom default)]
     (fn []
       (let [{:keys [username password]} @credentials
-            ;; loading @(subscribe [:loading])
             errors @(subscribe [:errors])
             login-user (fn [event credentials]
                          (.preventDefault event)

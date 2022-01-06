@@ -22,6 +22,7 @@
   (field-control id label
                  (fn [value update-form] [:input.input {:value @value
                                                         :on-change update-form
+                                                        :autocomplete "off"
                                                         :type "password" :placeholder placeholder}]) form-name))
 
 (defn number-input [id label placeholder form-name]

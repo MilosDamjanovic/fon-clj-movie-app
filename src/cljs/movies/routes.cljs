@@ -11,10 +11,9 @@
 (defn get-initial-panel
   "Retrieves the initial panel based weather the has the token or not"
   []
-  ;; (println (events/get-user))
   (if (events/get-user)
     (re-frame/dispatch [::events/navigate [:movies-index]])
-    (re-frame/dispatch[::events/navigate [:login-index]])))
+    (re-frame/dispatch [::events/navigate [:login-index]])))
 
 (def routes
   (atom

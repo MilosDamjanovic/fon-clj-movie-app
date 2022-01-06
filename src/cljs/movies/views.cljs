@@ -12,7 +12,6 @@
         route-params (re-frame/subscribe [::subs/route-params])]
     [:div
      [:nav.navbar.is-dark.is-spaced
-      (js/console.warn (str "user views.cljs" user))
       (if (empty? user)
         [:div.navbar-start
          [:a.navbar-item {:on-click #(re-frame/dispatch [::events/navigate [:create-user]])} "Sign up"]]

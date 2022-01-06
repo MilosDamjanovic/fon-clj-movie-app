@@ -11,7 +11,6 @@
 (re-frame/reg-sub
  ::select-author
  (fn [db [_ author_id]]
-   (js/console.warn author_id)
    (->> (:authors db)
         (filter #(= (:author_id %) author_id))
         first)))

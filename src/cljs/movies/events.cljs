@@ -1,17 +1,17 @@
 (ns movies.events
   (:require
    [re-frame.core :as re-frame]
-   [movies.db :as db]
+   [movies.db :refer [default-db set-user-ls get-user-token remove-user-ls]]
    [day8.re-frame.http-fx]
    [ajax.core :refer [json-request-format json-response-format]]
    [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (def set-user-interceptor [(re-frame/path :user)
-                           (re-frame/after db/set-user-ls)
+                           (re-frame/after set-user-ls)
                            re-frame/trim-v])
 
 
-(def remove-user-interceptor [(re-frame/after db/remove-user-ls)])
+(def remove-user-interceptor [(re-frame/after remove-user-ls)])
 
 (defn auth-header
   "Get user token and format for API authorization"
@@ -26,7 +26,7 @@
  [(re-frame/inject-cofx :local-store-user)]
 
  (fn [{:keys [local-store-user]} _]
-   {:db (assoc db/default-db :user local-store-user)}))
+   {:db (assoc default-db :user local-store-user)}))
 
 
 (re-frame/reg-event-fx
@@ -116,7 +116,7 @@
                  :timeout         8000
                  :response-format (json-response-format {:keywords? true})
                  :on-success      [::fetch-movie-reviews-success]
-                 :on-failure      [::bad-http-result]}}))
+                 :on-failure      [::bad-http-movie-review-result]}}))
 
 (re-frame/reg-event-db
  ::fetch-movie-reviews-success
@@ -130,6 +130,12 @@
  (fn [db [_ data]]
    (when (js/confirm "Failed to perform get-authors action on API")
      (js/console.error (str "Failed to perform get-authors action on API: ") data))))
+
+(re-frame/reg-event-db
+ ::bad-http-movie-review-result
+ (fn [db [_ data]]
+   (when (js/confirm "Failed to perform get-movie-reviews action on API")
+     (js/console.error (str "Failed to perform get-movie-reviews action on API: ") data))))
 
 (re-frame/reg-event-fx
  ::fetch-users
@@ -177,16 +183,17 @@
  set-user-interceptor
 
  (fn [{user :db} [{props :user}]]
-   {:db         (-> (merge user props)
-                    (assoc-in [:loading :login] false))
+   {:db         (-> (merge user props))
     :dispatch-n [[::fetch-authors]
                  [::fetch-movies]
                  [::fetch-genres]
                  [::fetch-movie-reviews]
-                 [::fetch-users]]}))
+                 [::fetch-users]
+                 (when (js/confirm "Successfully logged in!")
+                   (re-frame/dispatch [::navigate [:movies-index]]))]}))
 
 (defn get-user []
-  (db/get-user-token))
+  (get-user-token))
 
 (re-frame/reg-event-fx
  ::register-user
@@ -199,34 +206,38 @@
                  :format          (json-request-format)
                  :response-format (json-response-format {:keywords? true})
                  :on-success      [::register-user-success]
-                 :on-failure      [::api-request-error {:request-type :register-user}]}}))
+                 :on-failure      [:api-request-error {:request-type :register-user}]}}))
 
 (re-frame/reg-event-fx
  :register-user-success
  set-user-interceptor
 
  (fn [{user :db} [{props :user-form}]]
-   {:db       (-> (merge user props)
-                  (assoc-in [:loading :register-user] false))}
+   {:db
+    :dispatch [::navigate [:movies-index]]
+    (-> (merge user props)
+        :dispatch [::navigate [:movies-index]]
+        (assoc-in [:loading :register-user] false))}
    (when (js/confirm "Successfully registered a new user")
-     (re-frame/dispatch [::navigate [:login-index]]))))
+     (js/console.log  (str "user: " (:username user))))))
 
 
-(re-frame/reg-event-fx
- :logout
+(re-frame/reg-event-fx                                            ;; usage (dispatch [:logout])
+ ::logout
+ ;; This interceptor, defined above, makes sure
+ ;; that we clean up localStorage after logging-out
+ ;; the user.
  remove-user-interceptor
+ ;; The event handler function removes the user from
+ ;; app-state = :db and sets the url to "/".
  (fn [{:keys [db]} _]
-   {:db       (dissoc db :user)
-    :dispatch [::navigate [:login-index]]}
-
-
-
-   (when (js/confirm "Successfully logged out")
-     (js/console.warn db))))
+   {:db       (dissoc db :user)                          ;; remove user from db
+    :dispatch [::navigate [:login-index]]}))
 
 (re-frame/reg-event-db
  ::api-request-error
  (fn [db [_ {:keys [request-type loading]} response]]
    (-> db
        (assoc-in [:errors request-type] (get-in response [:response :errors]))
-       (assoc-in [:loading (or loading request-type)] false))))
+       (assoc-in [:loading (or loading request-type)] false))
+   (js/alert "Failed to register/login the user. Please try again later")))

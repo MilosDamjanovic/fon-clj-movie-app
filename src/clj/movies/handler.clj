@@ -1,6 +1,7 @@
 (ns movies.handler
   (:require
    [movies.user :as u]
+      [clojure.tools.logging :as log]
    [movies.util :refer [create-token]]))
 
 
@@ -25,6 +26,7 @@
   [{:keys [parameters]}]
   (try
     (let [data (:body parameters)
+          xx (log/info (str "kako ne radi?? " parameters))
           user (u/get-user-by-payload data)]
       (if (nil? user)
         {:status 404
