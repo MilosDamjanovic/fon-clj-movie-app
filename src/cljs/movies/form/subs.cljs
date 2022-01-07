@@ -4,6 +4,7 @@
 (re-frame/reg-sub
  ::form
  (fn [db [_ id form]]
+   (js/console.warn (str "form id") id)
    (case form
      "movie"  (get-in db [:movie-form id] "")
      "user"  (get-in db [:user-form id] "")

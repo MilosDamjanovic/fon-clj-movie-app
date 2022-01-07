@@ -18,7 +18,7 @@
         form-valid? @(re-frame/subscribe [::form-subs/mr-form-is-valid? [:review :rating :movie_id :author_id]])
         review (if edit-id "Update review" "Create review")]
     [:div
-     [:h1 review]
+     [:h1.is-size-3 review]
      [:hr]
      [:div.columns
       [:div.column.is-half

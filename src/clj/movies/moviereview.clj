@@ -11,12 +11,11 @@
 
 (defn create-movie-review [{:keys [parameters]}]
   (let [movie-review-json (:body parameters)
-        aaa (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date)
-        xx (log/info (str "---------- create-movie-review: " aaa))
+        movie-review-request (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date)
         saved (try
                 (db/insert-movie-review db/config (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date))
                 (catch Exception e (str "----------------Movie review exception: " (println e))))]
-    (log/info  (str "saved: " aaa))
+    (log/info  (str "Persisted movie review: " movie-review-request))
     {:status  (if saved 201 400)
      :body    (when (not saved)
                 "error or saving movie reivew")}))

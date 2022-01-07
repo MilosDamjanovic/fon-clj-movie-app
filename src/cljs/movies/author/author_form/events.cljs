@@ -1,7 +1,6 @@
 (ns movies.author.author-form.events
   (:require [re-frame.core :as re-frame]
             [ajax.core :as ajax]
-            [clojure.string :as str]
             [movies.events :as events]
             [day8.re-frame.http-fx]
             [clojure.set :as set]))
@@ -25,7 +24,6 @@
 
 
 (defn construct-url [author-id]
-  "Returns the uri depending if request method is POST or PUT"
   (str "http://localhost:4002/api/authors/" author-id))
 
 (re-frame/reg-event-fx
@@ -44,13 +42,14 @@
                    :format          (ajax/json-request-format)
                    :response-format (ajax/json-response-format {:keywords? true})
                    :on-success      [::saved-author]
-                   :on-failure      [:api-fail]}})))
+                   :on-failure      [::api-fail]}})))
 
 (re-frame/reg-event-db
  ::saved-author
  (fn [db [_ result]]
-   (re-frame/dispatch [::events/navigate [:authors-index]])
-   (assoc db :success-http-result result)))
+      (when (js/confirm "Successfully created a new movie director")
+        (re-frame/dispatch [::events/navigate [:authors-index]]))
+   ))
 
 (re-frame/reg-event-fx
  ::delete-author
@@ -69,8 +68,7 @@
  ::deleted-author
  (fn [db [_ result]]
    (when (js/confirm "Successfully deleted author")
-     (re-frame/dispatch [::events/navigate [:authors-index]]))
-   (assoc db :success-http-result result))
+     (re-frame/dispatch [::events/navigate [:authors-index]])))
  )
 
 

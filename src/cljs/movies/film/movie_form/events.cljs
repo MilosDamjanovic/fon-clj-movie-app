@@ -61,8 +61,12 @@
 (re-frame/reg-event-db
  ::saved-movie
  (fn [db [_ result]]
-   (js/alert "Successfully updated movie review")
-   (assoc db :success-http-result result)))
+   (js/console.warn (str "--------- saved-movie: ------------" result))
+   (when (js/confirm "Successfully updated/created movie!")
+     (-> db
+                         ;; (update :movies assob (:result db))
+         )
+     (re-frame/dispatch [::events/navigate [:movies-index]]))))
 
 (re-frame/reg-event-fx
  ::delete-movie
@@ -81,10 +85,16 @@
 (re-frame/reg-event-db
  ::deleted-movie
  (fn [db [_ result]]
-   (js/alert "Successfully deleted movie")
-   (assoc db :success-http-result result)))
+   (js/console.warn (str "--------- deleted-movie: ------------" result))
+   (when (js/confirm "Successfully deleted movie")
+     (-> db
+                ;; (update :movies dissoc (:active-comment db))
+         (dissoc :movie-form))
+     (re-frame/dispatch [::events/navigate [:movies-index]]))))
+
 
 (re-frame/reg-event-db
  ::api-fail
  (fn [db [_ result]]
-   (js/console.error (str "Failed to perform delete/update action on author: ") result)))
+   (when (js/confirm "Failed to perform delete/update action on movie: ")
+     (js/console.error (str "Failed to perform delete/update action on movie: ") result))))

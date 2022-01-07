@@ -9,12 +9,12 @@
 
 (defn create-movie
   [{:keys [parameters]}]
-  (try
-    (let [data (:body parameters)
-          created-id (db/insert-movie db/config data)]
-      {:status 201
-       :body (db/get-movie-by-id db/config created-id)})
-    (catch Exception e (str (log/info e)))))
+  (let [data (:body parameters)
+        saved (try (db/insert-movie db/config data)
+                   (catch Exception e (str "Failed to create a new movie entry in the database"  e)))]
+    {:status 201
+     :body    (when (not saved)
+                "error on saving movie")}))
 
 (defn get-movie-by-id
   [{:keys [parameters]}]

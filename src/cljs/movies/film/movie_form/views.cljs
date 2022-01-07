@@ -18,7 +18,7 @@
         form-valid? @(re-frame/subscribe [::form-subs/m-form-is-valid? [:movie_title :genre_id :author_id :year_of_issue]])
         movie (if edit-id "Update movie" "Create movie")]
     [:div
-     [:h1 movie]
+     [:h1.is-size-3 movie]
      [:hr]
      [:div.columns
       [:div.column.is-half
@@ -26,11 +26,13 @@
        (select-input :genre_id "Select genre" (get-genres) "movie")
        (select-input :author_id "Select movie director" (get-authors) "movie")
        (text-input :year_of_issue "Year of issue" "Year of issue" "movie")
-       [:button.button.is-info.is-light.ml-3
-        {:on-click #(when (js/confirm "Are you sure?")
-                      (re-frame/dispatch [::events/delete-movie edit-id]))} "Delete"]
-       [:button.button.is-primary.mt-4 {:disabled (not form-valid?)
-                                        :on-click #(re-frame/dispatch [::events/save-movie edit-id])} (if edit-id "Update" "Save")]]]]))
+
+       [:div.column.is-half.is-flex-direction-column
+        [:button.button.is-info.is-light.ml-3.mt-6
+         {:on-click #(when (js/confirm "Are you sure?")
+                       (re-frame/dispatch [::events/delete-movie edit-id]))} "Delete"]
+        [:button.button.is-primary..ml-3.mt-6 {:disabled (not form-valid?)
+                                         :on-click #(re-frame/dispatch [::events/save-movie edit-id])} (if edit-id "Update" "Save")]]]]]))
 
 
 (defn create-movie-panel []

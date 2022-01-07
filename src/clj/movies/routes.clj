@@ -15,6 +15,7 @@
    [movies.author :refer [get-authors create-author delete-author get-author-by-id update-author]]))
 
 (def ping-routes
+  "Helper routes for checking if the server is 'live'"
   ["/ping" {:name :ping
             :get (fn [_]
                    {:status 200
@@ -79,7 +80,7 @@
                          :handler update-author}
                    :delete {:middleware [wrap-jwt-authentication auth-middleware] :handler delete-author}}]])
 
-;; login routes
+
 (def auth-routes
   [["/users" {:get {:middleware [wrap-jwt-authentication auth-middleware]
                     :handler handle/get-all-users}}]

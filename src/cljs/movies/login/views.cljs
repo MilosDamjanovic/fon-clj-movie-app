@@ -1,8 +1,7 @@
 (ns movies.login.views
   (:require [reagent.core :as reagent]
             [movies.routes :as routes]
-            [movies.events :as events]
-            [re-frame.core :refer [subscribe dispatch]]))
+            [re-frame.core :refer [dispatch]]))
 
 (defn login-index
   []
@@ -10,36 +9,28 @@
         credentials (reagent/atom default)]
     (fn []
       (let [{:keys [username password]} @credentials
-            errors @(subscribe [:errors])
             login-user (fn [event credentials]
                          (.preventDefault event)
                          (dispatch [:login credentials]))]
-        [:div.auth-page
-         [:div.container.page
-          [:div.row
-           [:div.col-md-6.offset-md-3.col-xs-12
-            [:h1.text-xs-center "Sign in"]
-            [:p.text-xs-center
-            ;;  [:a {:href (url-for :register)} "Need an account?"] refactor navigation
-             ]
-            ;; (when (:login errors)
-            ;;   [errors-list (:login errors)]) ;; errors
-            [:form {:on-submit #(login-user % @credentials)}
-             [:fieldset.form-group
-              [:input.form-control.form-control-lg {:type        "text"
-                                                    :placeholder "Username"
-                                                    :value       username
-                                                    :on-change   #(swap! credentials assoc :username (-> % .-target .-value))
-                                                    ;; :disabled    (:login loading)
-                                                    }]]
+          [:div.columns
+           [:div.column.is-half
+            [:form.box {:on-submit #(login-user % @credentials)}
+             [:fieldset.field
+              [:label.label {:for ""} "Username"]
+              [:input.input {:type        "text"
+                             :placeholder "Username"
+                             :value       username
+                             :on-change   #(swap! credentials assoc :username (-> % .-target .-value))
+                             :required true}]]
 
-             [:fieldset.form-group
-              [:input.form-control.form-control-lg {:type        "password"
-                                                    :placeholder "Password"
-                                                    :value       password
-                                                    :on-change   #(swap! credentials assoc :password (-> % .-target .-value))
-                                                    ;; :disabled    (:login loading)
-                                                    }]]
-             [:button.btn.btn-lg.btn-primary.pull-xs-right  "Sign in"]]]]]]))))
+             [:fieldset.field
+              [:label.label {:for ""} "Password"]
+              [:input.input {:type        "password"
+                             :placeholder "Password"
+                             :value       password
+                             :on-change   #(swap! credentials assoc :password (-> % .-target .-value))
+                                                    :required true
+                             }]]
+             [:button.button.is-primary.mt-4  "Log in"]]]]))))
 
 (defmethod routes/panels :login-index-panel [] [login-index])
