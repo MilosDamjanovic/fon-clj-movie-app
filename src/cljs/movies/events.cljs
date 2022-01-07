@@ -164,7 +164,6 @@
 
 
 ;; -- POST Login @ /api/login -------------------------------------------
-;;
 (re-frame/reg-event-fx
  :login
  (fn [{:keys [db]} [_ credentials]]
@@ -222,16 +221,13 @@
      (js/console.log  (str "user: " (:username user))))))
 
 
-(re-frame/reg-event-fx                                            ;; usage (dispatch [:logout])
+(re-frame/reg-event-fx                                            
  ::logout
- ;; This interceptor, defined above, makes sure
- ;; that we clean up localStorage after logging-out
- ;; the user.
+
  remove-user-interceptor
- ;; The event handler function removes the user from
- ;; app-state = :db and sets the url to "/".
+
  (fn [{:keys [db]} _]
-   {:db       (dissoc db :user)                          ;; remove user from db
+   {:db       (dissoc db :user)                  
     :dispatch [::navigate [:login-index]]}))
 
 (re-frame/reg-event-db

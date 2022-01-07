@@ -30,7 +30,7 @@
         {:on-click #(when (js/confirm "Are you sure?")
                       (re-frame/dispatch [::events/delete-review edit-id]))} "Delete author"]
        [:button.button.is-primary.mt-6.ml-3 {:disabled (not form-valid?)
-                                             :on-click #(re-frame/dispatch [::events/save-review edit-id])} (if edit-id "Update" "Save")]]]]))
+                                             :on-click #(re-frame/dispatch [::events/save-review edit-id])} (if edit-id "Update" "Save")]][:hr]]]))
 
 
 (defn create-movie-review-panel []

@@ -8,13 +8,17 @@
    :body (db/get-movies db/config)})
 
 (defn create-movie
+  "Inserts a new movie into the database"
   [{:keys [parameters]}]
-  (let [data (:body parameters)
-        saved (try (db/insert-movie db/config data)
-                   (catch Exception e (str "Failed to create a new movie entry in the database"  e)))]
-    {:status 201
-     :body    (when (not saved)
-                "error on saving movie")}))
+  (try
+    (let [movie-json (:body parameters)
+          inserted-movie (db/insert-movie db/config movie-json)]
+      (log/info inserted-movie)
+      {:status  (if inserted-movie 201 400)
+       :body    (when-not (nil? inserted-movie)
+                  "error on saving movie"
+                  (db/get-movie-by-id db/config {:movie-id (get inserted-movie :movie_id)}))})
+    (catch Exception e (str "------ Failed to insert-movie : " e))))
 
 (defn get-movie-by-id
   [{:keys [parameters]}]
@@ -36,7 +40,7 @@
          :body movie}
         {:status 404
          :body {:error "movie not found"}}))
-    (catch Exception e (str "-------------- Failed to get movie review: " (println e)))))
+    (catch Exception e (log/error (str "-------------- Failed to get movie review: " (println e))))))
 
 (defn update-movie
   [{:keys [parameters]}]
@@ -52,7 +56,7 @@
         {:status 404
          :body {:updated false
                 :error "Unable to update movie"}}))
-    (catch Exception e (str "-------------- Failed to update movie: " (println e)))))
+    (catch Exception e (log/error (str "-------------- Failed to update movie: " (println e))))))
 
 (defn delete-movie
   [{:keys [parameters]}]

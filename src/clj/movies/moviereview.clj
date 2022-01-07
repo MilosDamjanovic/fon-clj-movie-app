@@ -5,22 +5,27 @@
    [movies.helper :as h]))
 
 (defn get-movie-reviews
+  "Retrieves all of the movie reviews from the database"
   [_]
   {:status 200
    :body (db/get-movie-reviews db/config)})
 
-(defn create-movie-review [{:keys [parameters]}]
-  (let [movie-review-json (:body parameters)
-        movie-review-request (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date)
-        saved (try
-                (db/insert-movie-review db/config (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date))
-                (catch Exception e (str "----------------Movie review exception: " (println e))))]
-    (log/info  (str "Persisted movie review: " movie-review-request))
-    {:status  (if saved 201 400)
-     :body    (when (not saved)
-                "error or saving movie reivew")}))
+(defn create-movie-review 
+  "Inserts a new movie review with complex primary key combining author and movie id and returns the newly created record"
+  [{:keys [parameters]}]
+  (try
+    (let [movie-review-json (:body parameters)
+          saved-review (db/insert-movie-review db/config (update-in movie-review-json [:date-of-review] h/str-date-to-sql-date))]
+      {:status  (if saved-review 201 400)
+       :body    (when-not (nil? saved-review)
+                  "error or saving movie reivew"
+                  (db/get-movie-review-by-author-and-movie-id db/config {:author-id (get saved-review :author_id) :movie-id (get saved-review :movie_id)})
+                  )})
+    (catch Exception e (log/error (str " ---------------- Movie review exception: " (println e))))))
+
 
 (defn get-movie-review
+  "Retrieves single movie review"
   [{:keys [parameters]}]
   (let [params (:path parameters)
         movie-review (db/get-movie-review-by-author-and-movie-id db/config {:author-id (get params :author-id) :movie-id (get params :movie-id)})]
@@ -32,6 +37,7 @@
 
 
 (defn update-movie-review
+  "Update the selected by author and movie id movie review and return the updated item"
   [{:keys [parameters]}]
   (try
     (let [params  (:path parameters)
@@ -49,6 +55,7 @@
     (catch Exception e (str " --------------- Failed to update movie review : " e))))
 
 (defn delete-movie-review
+  "Delete the selected movie review and return the deleted item"
   [{:keys [parameters]}]
   (try
     (let [params (:path parameters)

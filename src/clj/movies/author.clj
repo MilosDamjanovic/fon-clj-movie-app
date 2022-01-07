@@ -12,15 +12,18 @@
 
 
 (defn create-author
-"Inserts a new author into the database" 
+  "Inserts a new author into the database"
   [{:keys [parameters]}]
-  (let [author-json (:body parameters)
-        saved (try
-                (db/insert-author db/config (update-in author-json [:date-of-birth] h/str-date-to-sql-date))
-                (catch Exception e (str "------ Failed to insert-author : " e)))]
-    {:status  (if saved 201 400)
-     :body    (when (not saved)
-                "error on saving author")}))
+  (try
+    (let [author-json (:body parameters)
+          inserted-author (db/insert-author db/config (update-in author-json [:date-of-birth] h/str-date-to-sql-date))]
+
+      (log/info (str "da te vidimo "inserted-author))
+      {:status  (if inserted-author 201 400)
+       :body    (when-not (nil? inserted-author)
+                  "error on saving author"
+                  (db/get-author-by-id db/config {:author-id (get inserted-author :author_id)}))})
+    (catch Exception e (str "------ Failed to insert-author : " e))))
 
 (defn get-author-by-id
   "Fetch single author from the database"
@@ -54,7 +57,7 @@
     (catch Exception e (str " ------------ Failed to update author: " (println e)))))
 
 (defn delete-author
-  "Delete single author entry in the database by id"
+  "Delete single author entry in the database by author_id"
   [{:keys [parameters]}]
   (try
     (let [id (:path parameters)

@@ -118,17 +118,17 @@ WHERE m.author_id = :author-id;
 -- :name insert-movie :insert :*
 INSERT INTO movie (movie_title, genre_id, author_id, year_of_issue)
 VALUES(:movie-title, :genre-id, :author-id, :year-of-issue)
-RETURNING movie_id;
+RETURNING *;
 
 -- :name insert-movie-review :insert :*
 INSERT INTO moviereview (movie_id, author_id, rating, review, date_of_review)
 VALUES(:movie-id, :author-id, :rating, :review, :date-of-review)
-RETURNING (author_id, movie_id);
+RETURNING *;
 
 -- :name insert-author :insert :*
 INSERT INTO author (name, surname, date_of_birth, country)
 VALUES(:name, :surname, :date-of-birth, :country)
-RETURNING author_id;
+RETURNING *;
 
 -- :name insert-user :insert :*
 INSERT INTO users (username, email, password)
