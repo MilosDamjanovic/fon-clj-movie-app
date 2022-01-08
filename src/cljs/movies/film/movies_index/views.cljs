@@ -13,10 +13,9 @@
        {:on-click #(re-frame/dispatch
                     [::events/navigate [:create-movie]])} "Create movie"]]
 
-     (map (fn [movie] 
+     (map (fn [movie]
             [:div.mt-3
-             {:key (:movie_id movie)
-              :on-click #(re-frame/dispatch [::events/navigate [:movie-view :id (:movie_id movie)]])}
+             {:key (:movie_id movie)}
              [:span.mt-3 (str (:movie_title movie) " " (:year_of_issue movie) ", " (:author_name movie) " " (:author_surname movie))]
              [:button.button.is-info.ml-6
               {:on-click #(re-frame/dispatch

@@ -15,14 +15,13 @@
 
      (map (fn [author] 
             [:div.mt-3
-             {:key (:author_id author)
-              :on-click #(re-frame/dispatch
-                          [::events/navigate [:author-view :id (:author_id author)]])}
-             [:span (str (:name author) " " (:surname author))]
+             {:key (:author_id author)}
+            ;;   :on-click #(re-frame/dispatch
+            ;;               [::events/navigate [:author-view :id (:author_id author)]])}
+             [:span.mt-3 (str (:name author) " " (:surname author))]
              [:button.button.is-info.ml-6
               {:on-click #(re-frame/dispatch
-                           [::events/navigate [:edit-author :id (:author_id author)]])} "Edit Author"][:hr]]
-            )
-          authors)]))
+                           [::events/navigate [:edit-author :id (:author_id author)]])} "Edit Author"][:hr]])
+          (vals authors))]))
 
 (defmethod routes/panels :authors-index-panel [] [authors-index])

@@ -39,8 +39,9 @@
 (re-frame/reg-sub
  ::get-dropdown-authors
  (fn [db [_ _]]
+   (js/console.warn (vals (get db :authors [])))
    (into [] (map #(set/rename-keys % {:author_id :id :name :label})
-                 (get db :authors [])))))
+                  (get db :authors-array [])))))
 
 
 (defn construct-url [author-id movie-id]

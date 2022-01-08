@@ -17,6 +17,7 @@
   (let [edit-id @(re-frame/subscribe [::subs/edit-id])
         form-valid? @(re-frame/subscribe [::form-subs/m-form-is-valid? [:movie_title :genre_id :author_id :year_of_issue]])
         movie (if edit-id "Update movie" "Create movie")]
+    (js/console.warn edit-id)
     [:div
      [:h1.is-size-3 movie]
      [:hr]

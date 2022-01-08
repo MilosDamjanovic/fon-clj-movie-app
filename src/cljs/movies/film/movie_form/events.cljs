@@ -31,7 +31,7 @@
  ::get-dropdown-authors
  (fn [db [_ _]]
    (into [] (map #(set/rename-keys % {:author_id :id :name :label})
-                 (get db :authors [])))))
+                 (get db :authors-array [])))))
 
 
 (defn construct-url [movie-id]

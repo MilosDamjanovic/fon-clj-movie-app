@@ -18,12 +18,11 @@
     (let [author-json (:body parameters)
           inserted-author (db/insert-author db/config (update-in author-json [:date-of-birth] h/str-date-to-sql-date))]
 
-      (log/info (str "da te vidimo "inserted-author))
       {:status  (if inserted-author 201 400)
        :body    (when-not (nil? inserted-author)
                   "error on saving author"
                   (db/get-author-by-id db/config {:author-id (get inserted-author :author_id)}))})
-    (catch Exception e (str "------ Failed to insert-author : " e))))
+    (catch Exception e (log/error (str "------ Failed to insert-author : ")) e )))
 
 (defn get-author-by-id
   "Fetch single author from the database"
@@ -45,7 +44,6 @@
           data (assoc body :author-id author-id)
           req (update data :date-of-birth h/str-date-to-sql-date)
           updated-count (db/update-author-by-id db/config req)]
-      (log/info updated-count)
 
       (if (= 1 updated-count)
         {:status 200
@@ -54,7 +52,7 @@
         {:status 404
          :body {:updated false
                 :error "Unable to update author"}}))
-    (catch Exception e (str " ------------ Failed to update author: " (println e)))))
+    (catch Exception e (log/error (str " ------------ Failed to update author: "))  e)))
 
 (defn delete-author
   "Delete single author entry in the database by author_id"
@@ -70,4 +68,4 @@
         {:status 404
          :body {:deleted false
                 :error "Unable to delete author"}}))
-    (catch Exception e (str " -------------------- Failed to delete author " e))))
+    (catch Exception e (str " -------------------- Failed to delete author ") e)))

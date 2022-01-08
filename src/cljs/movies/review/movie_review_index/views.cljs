@@ -14,11 +14,12 @@
                     [::events/navigate [:create-movie-review]])} "Create movie review"]]
 
      (map (fn [movie-review]
+            [:hr]
             [:div.mt-3
              {:key [(:movie_id movie-review) (:author_id movie-review)]}
              [:span.mt-5 (str (:movie_name movie-review) ": " (:year_of_issue movie-review) ", " (:author_name movie-review) " " (:author_surname movie-review))]
              [:button.button.is-info.ml-6
               {:on-click #(re-frame/dispatch
-                           [::events/navigate [:edit-movie-review :author_id (:author_id movie-review) :movie_id (:movie_id movie-review)]])} "Edit movie review"]]) reviews)]))
+                           [::events/navigate [:edit-movie-review :author_id (:author_id movie-review) :movie_id (:movie_id movie-review)]])} "Edit movie review"]])  reviews)]))
 
 (defmethod routes/panels :movie-review-index-panel [] [movie-review-index])

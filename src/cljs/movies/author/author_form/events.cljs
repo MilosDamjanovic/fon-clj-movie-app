@@ -9,7 +9,10 @@
 (re-frame/reg-event-db
  ::initialise-edit-author
  (fn [db [_ author_id]]
-   (let [author (first (filter #(= (:author_id %) (int author_id)) (get db :authors)))]
+   (let [authors (get-in db [:authors])
+         author (get authors (int author_id))]
+
+
      (-> db
          (assoc :editing-author-id (int author_id))
          (assoc :author-form author)))))
@@ -47,34 +50,37 @@
 (re-frame/reg-event-db
  ::saved-author
  (fn [db [_ result]]
-      (when (js/confirm "Successfully created a new movie director")
-        (re-frame/dispatch [::events/navigate [:authors-index]]))
-   ))
+   (when (js/confirm "Successfully created a new movie director")
+     (re-frame/dispatch [::events/navigate [:authors-index]]))))
 
 (re-frame/reg-event-fx
  ::delete-author
  (fn [{:keys [db]} [_ editing-author-id]]
-   (let [uri (str "http://localhost:4002/api/authors/" editing-author-id)]
-     {:http-xhrio {:method          :delete
-                   :uri             uri
-                   :timeout         8000
-                   :headers         (events/auth-header db)
-                   :format          (ajax/json-request-format)
-                   :response-format (ajax/json-response-format {:keywords? true})
-                   :on-success      [:deleted-author]
-                   :on-failure      [:api-fail]}})))
+   {:db  (-> db
+             (assoc :active-author editing-author-id))
+    :http-xhrio {:method          :delete
+                 :uri             (str "http://localhost:4002/api/authors/" editing-author-id)
+                 :timeout         8000
+                 :headers         (events/auth-header db)
+                 :format          (ajax/json-request-format)
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [::deleted-author]
+                 :on-failure      [::api-fail]}}))
 
 (re-frame/reg-event-db
  ::deleted-author
  (fn [db [_ result]]
    (when (js/confirm "Successfully deleted author")
-     (re-frame/dispatch [::events/navigate [:authors-index]])))
- )
+     (-> db
+         (update :authors dissoc (:editing-author-id db))
+         (dissoc :editing-author-id)
+         (dissoc :active-author))
+     (re-frame/dispatch [::events/navigate [:authors-index]]))))
 
 
 (re-frame/reg-event-db
  ::api-fail
- 
+
  (fn [db [_ result]]
    (when (js/confirm "Failed to perform delete/update action on author")
      (js/console.error (str "Failed to perform delete/update action on author: ") result))))

@@ -9,10 +9,8 @@
    [movies.login.views]
    [movies.register.register-index.views]
    [movies.register.register-form.views]
-   [movies.film.movie-view.views]
    [movies.film.movie-form.views]
    [movies.author.authors-index.views]
-   [movies.author.author-view.views]
    [movies.author.author-form.views]
    [movies.review.movie-review-index.views]
    [movies.review.movie-review-form.views]))

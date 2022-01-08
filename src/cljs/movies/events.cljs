@@ -66,7 +66,8 @@
  (fn [db [_ data]]
    (-> db
        (assoc :loading false)
-       (assoc :authors data))))
+       (assoc :authors-array data) 
+       (assoc :authors (#(zipmap (map :author_id %) %) data)))))
 
 (re-frame/reg-event-fx
  ::fetch-movies
@@ -221,13 +222,13 @@
      (js/console.log  (str "user: " (:username user))))))
 
 
-(re-frame/reg-event-fx                                            
+(re-frame/reg-event-fx
  ::logout
 
  remove-user-interceptor
 
  (fn [{:keys [db]} _]
-   {:db       (dissoc db :user)                  
+   {:db       (dissoc db :user)
     :dispatch [::navigate [:login-index]]}))
 
 (re-frame/reg-event-db

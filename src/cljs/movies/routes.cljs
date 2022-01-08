@@ -20,7 +20,6 @@
    ["/" {""       (get-initial-panel)
          "movies" {"/all" :movies-index
                    "/create" :create-movie
-                   ["/" :id "/view"] :movie-view
                    ["/" :id "/edit"] :edit-movie}
          "reviews"  {"" :movie-review-index
                            "/create" :create-movie-review
@@ -30,8 +29,7 @@
          "login" :login-index
          "authors" {"" :authors-index
                     "/create" :create-author
-                    ["/" :id "/edit"]  :edit-author
-                    ["/" :id "/view"]  :author-view}}]))
+                    ["/" :id "/edit"]  :edit-author}}]))
 
 
 (defn parse

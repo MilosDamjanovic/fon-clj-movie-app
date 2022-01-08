@@ -19,9 +19,9 @@
       {:status  (if saved-review 201 400)
        :body    (when-not (nil? saved-review)
                   "error or saving movie reivew"
-                  (db/get-movie-review-by-author-and-movie-id db/config {:author-id (get saved-review :author_id) :movie-id (get saved-review :movie_id)})
+                  (db/get-movie-review-by-author-and-movie-id db/config{:author-id (get saved-review :author_id) :movie-id (get saved-review :movie_id)})
                   )})
-    (catch Exception e (log/error (str " ---------------- Movie review exception: " (println e))))))
+    (catch Exception e (log/error (str " ---------------- create-movie-review exception: " ) e))))
 
 
 (defn get-movie-review
@@ -42,17 +42,18 @@
   (try
     (let [params  (:path parameters)
           body (:body parameters)
-          data (assoc body :author-id (get params :author-id) :movie-id (get params :movie-id))
-          request (update data :date-of-review h/str-date-to-sql-date)
+          data (update-in body [:date-of-review] h/str-date-to-sql-date)
+          request (merge params data)
           updated-count (db/update-movie-review-by-author-and-movie-id db/config request)]
       (if (= 1 updated-count)
         {:status 200
          :body {:updated true
-                :movie-review (db/get-movie-review-by-author-and-movie-id db/config {:author-id (get params :author-id) :movie-id (get params :movie-id)})}}
+                :movie-review (db/get-movie-review-by-author-and-movie-id db/config {:author-id (int (get params :author-id)) :movie-id (int (get params :movie-id))})}}
         {:status 404
          :body {:updated false
-                :error "Unable to update movie review"}}))
-    (catch Exception e (str " --------------- Failed to update movie review : " e))))
+                :error "Unable to update movie review"}})
+      )
+    (catch Exception e (log/error (str " --------------- Failed to update movie review : " ) e))))
 
 (defn delete-movie-review
   "Delete the selected movie review and return the deleted item"
@@ -68,4 +69,4 @@
         {:status 404
          :body {:deleted false
                 :error "Unable to delete movie review"}}))
-    (catch Exception e (str "Failed to delete movie review" e))))
+    (catch Exception e (log/error (str "Failed to delete movie review" ) e))))
