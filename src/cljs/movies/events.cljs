@@ -66,7 +66,7 @@
  (fn [db [_ data]]
    (-> db
        (assoc :loading false)
-       (assoc :authors-array data) 
+       (assoc :authors-array data)
        (assoc :authors (#(zipmap (map :author_id %) %) data)))))
 
 (re-frame/reg-event-fx
@@ -209,16 +209,16 @@
                  :on-failure      [:api-request-error {:request-type :register-user}]}}))
 
 (re-frame/reg-event-fx
- :register-user-success
+ ::register-user-success
  set-user-interceptor
 
  (fn [{user :db} [{props :user-form}]]
    {:db
-    :dispatch [::navigate [:movies-index]]
+    :dispatch (re-frame/dispatch [::navigate [:login-index]])
     (-> (merge user props)
-        :dispatch [::navigate [:movies-index]]
         (assoc-in [:loading :register-user] false))}
    (when (js/confirm "Successfully registered a new user")
+
      (js/console.log  (str "user: " (:username user))))))
 
 

@@ -1,8 +1,7 @@
 (ns movies.register.register-index.views
   (:require [re-frame.core :as re-frame]
             [movies.register.register-index.subs :as subs]
-            [movies.routes :as routes]
-            [movies.events :as events]))
+            [movies.routes :as routes]))
 
 (defn register-index []
   (let [users @(re-frame/subscribe [::subs/users])]
@@ -13,6 +12,6 @@
      (map (fn [user] 
             [:div.mt-3
              {:key (:id user)}
-             [:span.mt-5 (str (:email user) " " (:username user))]]) users)]))
+             [:span.mt-5  [:b "Email: " ] (:email user) " " [:b "Username: "] (:username user)][:hr]]) users)]))
 
 (defmethod routes/panels :register-index-panel [] [register-index])

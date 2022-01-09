@@ -22,7 +22,7 @@ You will need Docker installed to create the database.
 
 **About start application and path to database:**
 
-> When starting the application we need to start the docker container.
+> When starting the application we need to start the docker container image configured in the `docker-compose.yml`.
 
 ```sh
 sudo docker-compose up
@@ -52,9 +52,9 @@ This is the configuration for our database postgres database connection.
 
 >This application is intended for keeping track of movie reviews. The user can login to the application, create/update/delete and read movies, add/update/delete and get movie directors and leave (insert/update/create/delete) movie reviews for different movies and movie directors. You can register your user account. Only logged in users can create/edit movies and authors and leave movie reviews.
 
-> The database definition is inside the **movies.sql** file and when the application is started by running the command:
+> The database definition is inside the **movies.sql** file and the server application is started by running the command:
 
-```
+```sh
 clj -A run
 ```
 
@@ -67,15 +67,15 @@ For creating the database schema ```(hugsql/def-db-fns "movies.sql")``` we need 
 >After start the application, we have some cards in *navbar:* **Directors, Manage movie reviews,Users, Movies**.
 
 >In card **Directors** we perform basic CRUD operations on the table autor in database.
-First:**INSERT** author-we have form for entry data about new author in database clj_movies_db in table autor.
-Second:**SELECT** authors-display in the table all the authors from the database.
-Also we perform **UPDATE**:change data about choose author from table and save new data about this choose author in the table and database.
-Third:**DELETE** author -we delete the chosen author from database.
+First:**INSERT** author -we have form for entry data about new author in database clj_movies_db in table autor.
+Second:**SELECT** authors -display in the table all the authors from the database.
+Also we perform **UPDATE**author - change data about choosen author from table and save new data about the author in the table and database.
+Third:**DELETE** author -  we delete the chosen author from database.
 
->In card **Movies** we also perform basic CRUD operations on the table moviereview in database bibliteka.
->>We connect table movie with table autor with foreign key by **autor_id**.
+>In card **Movies** we also perform basic CRUD operations on the table movie in database bibliteka.
+>>We connect table **movie** with table **autor** with foreign key by **autor_id**.
 In this menu card we can **INSERT** new movie where have form for entry data about new movie. In this form also we have to choose the name of the author for movie which needs to be insert, but just authors which exists in database. Then we have **SELECT** command which display in the table all the movies from the database which order by movie_name.
-With **DELETE** command we delete choose movie from database.
+With **DELETE** command: we delete choose movie from database.
 At the end with **UPDATE**: we modify the data about chosen movie from table and save new data about the movie chosen in the database.
 
 
@@ -84,7 +84,7 @@ At the end with **UPDATE**: we modify the data about chosen movie from table and
 
 >>We have an auxiliary table called **genres** which is connected to the *movie* table since every movie has a belonging genre.
 
->We add new card **Users** where have all registered users. 
+>We add new card **Users** where list all registered users. 
 >> On sign up we **insert-user** into the database. 
 
 >>All CRUD operation which describe are here. We have multiple routes do differentiate the resources. 
@@ -118,7 +118,6 @@ BACKEND
         <div id="app"></div>
         ```
   - Generated directories and files
-    - Created on build with either the [dev](#running-the-app) or [prod](#production) profile
     - `js/compiled/`: compiled CLJS (`shadow-cljs`)
       - Not tracked in source control; see [`.gitignore`](.gitignore)
 * [`src/cljs/movies/`]: SPA source files (ClojureScript, [re-frame](https://github.com/Day8/re-frame))
@@ -142,15 +141,14 @@ When `[:app] Build completed` appears in the output, browse to
 [`shadow-cljs`](https://github.com/thheller/shadow-cljs) will automatically push ClojureScript code changes to your browser on save. 
 
 
->> The network requests for fetching authors, movies, genres and moviereviews.
+>> Handling the network requests for fetching authors, movies, genres and moviereviews, user registration and login. On login we use interceptors to store user and user token.
 
 ```
 (ns movies.events) 
 
 ```
 
->> The inital view of the application which lists all of the panels and displays them based on whether the user is authenticated (Movies, Directors, Manage movie reviews and Users).
-or Sign up if the user isn't registerd.
+>> The inital view of the application which lists all of the panels and displays them based on whether the user is authenticated (Movies, Directors, Manage movie reviews and Users). or Sign up if the user isn't registerd.
 
 ```
 (ns movies.views) 

@@ -67,12 +67,12 @@
                  :on-success      [::deleted-author]
                  :on-failure      [::api-fail]}}))
 
+
 (re-frame/reg-event-db
  ::deleted-author
  (fn [db [_ result]]
    (when (js/confirm "Successfully deleted author")
      (-> db
-         (update :authors dissoc (:editing-author-id db))
          (dissoc :editing-author-id)
          (dissoc :active-author))
      (re-frame/dispatch [::events/navigate [:authors-index]]))))
